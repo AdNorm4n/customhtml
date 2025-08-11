@@ -1,36 +1,44 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Kuala Lumpur Air Quality</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-  }
-</style>
-</head>
-<body>
-<h3>Kuala Lumpur Air Quality (Live from DOE/APIMS)</h3>
-<div id="kl-aqi"></div>
+<div id="aqi-widget" style="font-family: Arial; padding: 15px; border-radius: 10px; background: #222; color: white; width: 250px;">
+  <h3 id="aqi-city">Loading...</h3>
+  <p id="aqi-value" style="font-size: 2em; font-weight: bold;">--</p>
+  <p id="aqi-status">--</p>
+  <small id="aqi-updated">Updated: --</small>
+</div>
 
 <script>
-/* WAQI city widget bootstrap */
-(function(w,d,t,f){
-  w[f]=w[f]||function(c,k,n){
-    s=w[f],k=s.k=s.k||(k?('&k='+k):'');
-    s.c=c=c instanceof Array?c:[c];s.n=n=n||0;
-    L=d.createElement(t),e=d.getElementsByTagName(t)[0];
-    L.async=1;
-    L.src='https://feed.aqicn.org/feed/'+(c[n].city)+'/'+(c[n].lang||'')+'/feed.v1.js?n='+n+k;
-    e.parentNode.insertBefore(L,e);
-  };
-})(window,document,'script','_aqiFeed');
+  const token = "902f87a0a51e5839820aae018e6d08cebfdcd2b8";
+  const city = "Kuala Lumpur"; // change to your city or station name
 
-/* Render Kuala Lumpur */
-_aqiFeed({ container: 'kl-aqi', city: 'kuala-lumpur', lang: 'en' });
+  async function fetchAQI() {
+    try {
+      const res = await fetch(`https://api.waqi.info/feed/${city}/?token=${token}`);
+      const data = await res.json();
+
+      if (data.status === "ok") {
+        const aqi = data.data.aqi;
+        const cityName = data.data.city.name;
+        const time = data.data.time.s;
+
+        let status = "";
+        if (aqi <= 50) status = "Good 😊";
+        else if (aqi <= 100) status = "Moderate 😐";
+        else if (aqi <= 150) status = "Unhealthy for Sensitive Groups 😷";
+        else if (aqi <= 200) status = "Unhealthy 😷";
+        else if (aqi <= 300) status = "Very Unhealthy 😨";
+        else status = "Hazardous ☠️";
+
+        document.getElementById("aqi-city").textContent = cityName;
+        document.getElementById("aqi-value").textContent = aqi;
+        document.getElementById("aqi-status").textContent = status;
+        document.getElementById("aqi-updated").textContent = `Updated: ${time}`;
+      } else {
+        document.getElementById("aqi-city").textContent = "Error fetching data";
+      }
+    } catch (e) {
+      document.getElementById("aqi-city").textContent = "Error loading data";
+    }
+  }
+
+  fetchAQI();
+  setInterval(fetchAQI, 30 * 60 * 1000); // refresh every 30 minutes
 </script>
-
-</body>
-</html>
