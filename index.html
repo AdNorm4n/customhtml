@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Kuala Lumpur Air Quality</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+  }
+</style>
+</head>
+<body>
+<h3>Kuala Lumpur Air Quality (Live from DOE/APIMS)</h3>
+<div id="kl-aqi"></div>
+
+<script>
+/* WAQI city widget bootstrap */
+(function(w,d,t,f){
+  w[f]=w[f]||function(c,k,n){
+    s=w[f],k=s.k=s.k||(k?('&k='+k):'');
+    s.c=c=c instanceof Array?c:[c];s.n=n=n||0;
+    L=d.createElement(t),e=d.getElementsByTagName(t)[0];
+    L.async=1;
+    L.src='https://feed.aqicn.org/feed/'+(c[n].city)+'/'+(c[n].lang||'')+'/feed.v1.js?n='+n+k;
+    e.parentNode.insertBefore(L,e);
+  };
+})(window,document,'script','_aqiFeed');
+
+/* Render Kuala Lumpur */
+_aqiFeed({ container: 'kl-aqi', city: 'kuala-lumpur', lang: 'en' });
+</script>
+
+</body>
+</html>
